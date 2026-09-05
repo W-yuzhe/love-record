@@ -1,0 +1,82 @@
+// 城市名 -> SVG 省份 ID（与 src/assets/china-map.svg 中 data-id 对应）
+export const cityToProvince: Record<string, string> = {
+  北京: 'CN.BJ',
+  上海: 'CN.SH',
+  天津: 'CN.TJ',
+  重庆: 'CN.CQ',
+  广州: 'CN.GD',
+  深圳: 'CN.GD',
+  杭州: 'CN.ZJ',
+  宁波: 'CN.ZJ',
+  南京: 'CN.JS',
+  苏州: 'CN.JS',
+  成都: 'CN.SC',
+  西安: 'CN.SA',
+  武汉: 'CN.HU',
+  长沙: 'CN.HN',
+  厦门: 'CN.FJ',
+  青岛: 'CN.SD',
+  济南: 'CN.SD',
+  大连: 'CN.LN',
+  昆明: 'CN.YN',
+  大理: 'CN.YN',
+  丽江: 'CN.YN',
+  三亚: 'CN.HA',
+  桂林: 'CN.GX',
+  南宁: 'CN.GX',
+  拉萨: 'CN.XZ',
+  乌鲁木齐: 'CN.XJ',
+  哈尔滨: 'CN.HL',
+  郑州: 'CN.HE',
+  合肥: 'CN.AH',
+  南昌: 'CN.JX',
+  贵阳: 'CN.GZ',
+  兰州: 'CN.GS',
+  西宁: 'CN.QH',
+  银川: 'CN.NX',
+}
+
+// SVG 省份 ID -> 中文名（用于提示、图例等）
+export const provinceNames: Record<string, string> = {
+  'CN.BJ': '北京',
+  'CN.SH': '上海',
+  'CN.TJ': '天津',
+  'CN.CQ': '重庆',
+  'CN.GD': '广东',
+  'CN.ZJ': '浙江',
+  'CN.JS': '江苏',
+  'CN.SC': '四川',
+  'CN.SA': '陕西',
+  'CN.HU': '湖北',
+  'CN.HN': '湖南',
+  'CN.FJ': '福建',
+  'CN.SD': '山东',
+  'CN.LN': '辽宁',
+  'CN.YN': '云南',
+  'CN.HA': '海南',
+  'CN.GX': '广西',
+  'CN.XZ': '西藏',
+  'CN.XJ': '新疆',
+  'CN.HL': '黑龙江',
+  'CN.HE': '河南',
+  'CN.AH': '安徽',
+  'CN.JX': '江西',
+  'CN.GZ': '贵州',
+  'CN.GS': '甘肃',
+  'CN.QH': '青海',
+  'CN.NX': '宁夏',
+  'CN.SX': '山西',
+  'CN.HB': '河北',
+  'CN.JL': '吉林',
+  'CN.NM': '内蒙古',
+}
+
+// SVG 省份 ID -> 该省份下可选的城市名列表（便于反向查找）
+export const provinceToCities = Object.entries(cityToProvince).reduce(
+  (acc, [city, provinceId]) => {
+    if (!acc[provinceId]) acc[provinceId] = []
+    acc[provinceId].push(city)
+    return acc
+  },
+  {} as Record<string, string[]>,
+)
