@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { Sparkles, X } from 'lucide-react'
 import { useMemories } from '@/hooks/useMemories'
 
-const starImage = '/star-sky.jpg'
+const starImage = '/star-sky.png'
 
 interface Star {
   id: number

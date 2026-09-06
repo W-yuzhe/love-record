@@ -77,7 +77,7 @@ VITE_TENCENT_MAP_KEY=你复制的腾讯地图 Key
 
 | 页面 | 图片文件名 | 放置位置 |
 |------|-----------|---------|
-| 星空页 | `star-sky.jpg` | `love-record-site/public/star-sky.jpg` |
+| 星空页 | `star-sky.png` | `love-record-site/public/star-sky.png` |
 | 首页 Hero | `hero-bg.png` | `love-record-site/public/hero-bg.png` |
 
 图片不存在时会用 CSS 渐变兜底，不会报错。
