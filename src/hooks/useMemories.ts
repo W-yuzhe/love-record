@@ -16,7 +16,7 @@ import {
 } from '@/api/memories'
 import type { UpdateMemoryInput } from '@/api/memories'
 
-function mapMemory(m: any): Memory {
+export function mapMemory(m: any): Memory {
   return {
     ...m,
     locations: m.memory_locations || [],
@@ -33,17 +33,18 @@ export function useMemories() {
   const [loading, setLoading] = useState(true)
 
   const refresh = useCallback(async () => {
-    if (!isSupabaseConfigured || !couple) {
+    if (!isSupabaseConfigured) {
       setMemories(getLocalMemories())
       setLoading(false)
       return
     }
 
     setLoading(true)
+    // 所有回忆都已公开：未登录/无 couple 的访客也能读取
     const { data, error } = await supabase
       .from('memories')
       .select(`*, memory_locations(*), memory_media(*), memory_tags(tag)`)
-      .eq('couple_id', couple.id)
+      .eq('visibility', 'public')
       .order('date', { ascending: false })
 
     if (!error && data) {
@@ -53,7 +54,7 @@ export function useMemories() {
       setMemories(getLocalMemories())
     }
     setLoading(false)
-  }, [couple])
+  }, [])
 
   useEffect(() => {
     refresh()
@@ -139,7 +140,6 @@ export function useMemories() {
 }
 
 export function useMemory(id?: string) {
-  const { couple } = useAuth()
   const [memory, setMemory] = useState<Memory | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -151,7 +151,7 @@ export function useMemory(id?: string) {
 
     const fallback = mockMemories.find((m) => m.id === id) || getLocalMemories().find((m) => m.id === id)
 
-    if (!isSupabaseConfigured || !couple) {
+    if (!isSupabaseConfigured) {
       setMemory(fallback || null)
       setLoading(false)
       return
@@ -159,11 +159,12 @@ export function useMemory(id?: string) {
 
     const fetch = async () => {
       setLoading(true)
+      // 公开回忆详情：无需 couple/登录即可读取
       const { data, error } = await supabase
         .from('memories')
         .select(`*, memory_locations(*), memory_media(*), memory_tags(tag)`)
         .eq('id', id)
-        .eq('couple_id', couple.id)
+        .eq('visibility', 'public')
         .single()
 
       if (!error && data) {
@@ -175,7 +176,7 @@ export function useMemory(id?: string) {
     }
 
     fetch()
-  }, [id, couple])
+  }, [id])
 
   return { memory, loading }
 }

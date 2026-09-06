@@ -157,6 +157,7 @@ export default function Memories() {
     await updateMemory(active.memory.id, {
       date: input.date,
       tags: input.tags,
+      visibility: 'public',
     })
   }
 

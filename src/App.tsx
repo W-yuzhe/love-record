@@ -7,7 +7,6 @@ import Memories from '@/pages/Memories'
 import CreateMemory from '@/pages/CreateMemory'
 import MemoryDetail from '@/pages/MemoryDetail'
 import Wishes from '@/pages/Wishes'
-import Gallery from '@/pages/Gallery'
 import StarrySky from '@/pages/StarrySky'
 import MonthAlbum from '@/pages/MonthAlbum'
 import EditMemory from '@/pages/EditMemory'
@@ -23,7 +22,6 @@ function App() {
           <Route path="/memories/new" element={<CreateMemory />} />
           <Route path="/memories/:id" element={<MemoryDetail />} />
           <Route path="/wishes" element={<Wishes />} />
-          <Route path="/gallery" element={<Gallery />} />
           <Route path="/starry" element={<StarrySky />} />
           <Route path="/album/:monthKey" element={<MonthAlbum />} />
           <Route path="/memories/:id/edit" element={<EditMemory />} />

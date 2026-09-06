@@ -3,7 +3,7 @@ export function getMonthsBetween(startDate: string) {
   const now = new Date()
   const months: { key: string; monthName: string; year: string; label: string }[] = []
 
-  let current = new Date(start.getFullYear(), start.getMonth(), 1)
+  const current = new Date(start.getFullYear(), start.getMonth(), 1)
   const end = new Date(now.getFullYear(), now.getMonth(), 1)
 
   const monthNames = [

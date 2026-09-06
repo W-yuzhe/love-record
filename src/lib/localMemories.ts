@@ -10,7 +10,15 @@ export function getLocalMemories(): Memory[] {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return mockMemories
     const parsed = JSON.parse(raw) as Memory[]
-    return parsed.length > 0 ? parsed : mockMemories
+    if (parsed.length === 0) return mockMemories
+    // 统一将本地回忆可见性设为公开，确保现有数据也能被访客浏览
+    const normalized = parsed.map((m) =>
+      m.visibility === 'public' ? m : { ...m, visibility: 'public' as const },
+    )
+    if (normalized.some((m, i) => m.visibility !== parsed[i].visibility)) {
+      saveLocalMemories(normalized)
+    }
+    return normalized
   } catch {
     return mockMemories
   }

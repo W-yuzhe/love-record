@@ -213,7 +213,7 @@ export default function EditMemory() {
         description,
         mood: (mood as MemoryMood) || undefined,
         weather: weather || undefined,
-        visibility: 'couple',
+        visibility: 'public',
         locations: selectedLocation
           ? [
               {

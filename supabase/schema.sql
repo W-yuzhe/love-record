@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS memories (
   description TEXT,
   mood TEXT,
   weather TEXT,
-  visibility TEXT NOT NULL DEFAULT 'couple' CHECK (visibility IN ('private','couple','public')),
+  visibility TEXT NOT NULL DEFAULT 'public' CHECK (visibility IN ('private','couple','public')),
   created_by UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   couple_id UUID REFERENCES couples(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -229,6 +229,26 @@ CREATE POLICY "own_stardust_notes" ON stardust_notes
     couple_id IN (SELECT id FROM couples WHERE partner_a_id = auth.uid() OR partner_b_id = auth.uid())
   );
 
+-- 公开读取策略：允许未登录访客只读访问 visibility='public' 的记忆及其关联资源
+DROP POLICY IF EXISTS "public_memories" ON memories;
+CREATE POLICY "public_memories" ON memories
+  FOR SELECT USING (visibility = 'public');
+
+DROP POLICY IF EXISTS "public_memory_locations" ON memory_locations;
+CREATE POLICY "public_memory_locations" ON memory_locations
+  FOR SELECT USING (memory_id IN (SELECT id FROM memories WHERE visibility = 'public'));
+
+DROP POLICY IF EXISTS "public_memory_media" ON memory_media;
+CREATE POLICY "public_memory_media" ON memory_media
+  FOR SELECT USING (memory_id IN (SELECT id FROM memories WHERE visibility = 'public'));
+
+DROP POLICY IF EXISTS "public_memory_tags" ON memory_tags;
+CREATE POLICY "public_memory_tags" ON memory_tags
+  FOR SELECT USING (memory_id IN (SELECT id FROM memories WHERE visibility = 'public'));
+
+-- 一次性迁移：将已有回忆统一设为公开（如不希望全部公开，可注释掉下面两行）
+UPDATE memories SET visibility = 'public' WHERE visibility != 'public';
+
 -- 触发器：自动更新 updated_at
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
@@ -251,3 +271,8 @@ DROP POLICY IF EXISTS "authenticated_upload" ON storage.objects;
 CREATE POLICY "authenticated_upload" ON storage.objects
   FOR ALL USING (bucket_id = 'memory-photos' AND auth.role() = 'authenticated')
   WITH CHECK (bucket_id = 'memory-photos' AND auth.role() = 'authenticated');
+
+-- 公开读取：匿名/未登录用户可直接访问已上传的图片 URL
+DROP POLICY IF EXISTS "public_memory_photos_read" ON storage.objects;
+CREATE POLICY "public_memory_photos_read" ON storage.objects
+  FOR SELECT USING (bucket_id = 'memory-photos');

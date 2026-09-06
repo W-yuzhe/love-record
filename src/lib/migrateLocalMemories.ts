@@ -47,7 +47,7 @@ export async function migrateLocalMemories(
         description: memory.description,
         mood: memory.mood,
         weather: memory.weather,
-        visibility: memory.visibility || 'private',
+        visibility: 'public',
         created_by: userId,
         couple_id: coupleId,
         created_at: memory.created_at || now,
