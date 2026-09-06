@@ -29,7 +29,7 @@ export function FloatingMusicPlayer() {
   }, [isOpen])
 
   const iframeSrc = NETEASE_PLAYLIST_ID
-    ? `https://music.163.com/outchain/player?type=0&id=${NETEASE_PLAYLIST_ID}&auto=1&height=90`
+    ? `https://music.163.com/outchain/player?type=0&id=${NETEASE_PLAYLIST_ID}&auto=1&height=430`
     : ''
 
   if (!NETEASE_PLAYLIST_ID) {
@@ -45,7 +45,7 @@ export function FloatingMusicPlayer() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ duration: 0.25 }}
-            className="mb-2 w-[300px] overflow-hidden rounded-2xl border border-white/10 bg-[#151025]/95 p-4 shadow-2xl backdrop-blur-glass"
+            className="mb-2 w-[340px] overflow-hidden rounded-2xl border border-white/10 bg-[#151025]/95 p-4 shadow-2xl backdrop-blur-glass"
           >
             <div className="mb-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -63,7 +63,7 @@ export function FloatingMusicPlayer() {
 
             <div className="relative overflow-hidden rounded-xl border border-white/10 bg-black/40">
               {!isLoaded && (
-                <div className="flex h-[90px] w-full items-center justify-center text-xs text-white/40">
+                <div className="flex h-[430px] w-full items-center justify-center text-xs text-white/40">
                   <Disc3 className="mr-2 h-4 w-4 animate-spin" />
                   加载播放器…
                 </div>
@@ -72,16 +72,16 @@ export function FloatingMusicPlayer() {
                 title="网易云音乐"
                 src={iframeSrc}
                 width="100%"
-                height="90"
+                height="430"
                 frameBorder="0"
-                allow="autoplay"
+                allow="autoplay; encrypted-media"
                 className={`block ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
                 onLoad={() => setIsLoaded(true)}
               />
             </div>
 
             <p className="mt-2 text-[10px] leading-relaxed text-white/40">
-              已设置为自动播放，但部分浏览器仍可能需要用户先与页面交互一次才能出声。
+              已设置为自动播放，受浏览器限制，部分设备需先与页面交互一次才能出声。
             </p>
           </motion.div>
         )}
