@@ -7,7 +7,7 @@ import { useMemories } from '@/hooks/useMemories'
 import { getMonthsBetween } from '@/utils/date'
 import { getLocalMonthCover } from '@/lib/localMonthCovers'
 
-const heroImage = '/hero-bg.jpg'
+const heroImage = '/hero-bg.png'
 
 function getMonthCover(monthKey: string, memories: { date: string; media: { url: string }[] }[]) {
   const localCover = getLocalMonthCover(monthKey)

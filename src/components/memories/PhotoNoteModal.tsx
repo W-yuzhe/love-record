@@ -9,6 +9,7 @@ import {
   Loader2,
   Plus,
   Tag,
+  PenLine,
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { Memory, MemoryMedia } from '@/types'
@@ -42,11 +43,13 @@ export function PhotoNoteModal({
   const [tagInput, setTagInput] = useState('')
   const [saving, setSaving] = useState(false)
   const [savingMeta, setSavingMeta] = useState(false)
+  const [editingNote, setEditingNote] = useState(false)
 
   useEffect(() => {
     setNote(media.note || '')
     setDate(memory.date)
     setTags(memory.tags || [])
+    setEditingNote(false)
   }, [media.note, memory.date, memory.tags])
 
   useEffect(() => {
@@ -61,6 +64,7 @@ export function PhotoNoteModal({
     setSaving(true)
     try {
       await onSaveNote(note)
+      setEditingNote(false)
     } finally {
       setSaving(false)
     }
@@ -238,14 +242,36 @@ export function PhotoNoteModal({
                 </div>
               )}
 
-              <label className="mb-2 block text-sm font-medium text-white/70">便签</label>
-              <textarea
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                rows={6}
-                placeholder="写下这张照片的故事…"
-                className="w-full resize-none rounded-xl border border-glass-border bg-white/5 px-4 py-3 text-white placeholder-white/30 outline-none ring-star-pink/30 transition-all focus:ring-2"
-              />
+              <div className="mb-2 flex items-center justify-between">
+                <label className="text-sm font-medium text-white/70">便签</label>
+                {!editingNote && (
+                  <button
+                    type="button"
+                    onClick={() => setEditingNote(true)}
+                    className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-white/60 transition-colors hover:bg-white/10 hover:text-white"
+                  >
+                    <PenLine className="h-3.5 w-3.5" />
+                    编辑
+                  </button>
+                )}
+              </div>
+              {editingNote ? (
+                <textarea
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  rows={6}
+                  placeholder="写下这张照片的故事…"
+                  className="w-full resize-none rounded-xl border border-glass-border bg-white/5 px-4 py-3 text-white placeholder-white/30 outline-none ring-star-pink/30 transition-all focus:ring-2"
+                />
+              ) : (
+                <div className="min-h-[120px] rounded-xl border border-white/10 bg-white/5 px-4 py-3">
+                  {note ? (
+                    <p className="text-sm leading-relaxed text-white/80">“{note}”</p>
+                  ) : (
+                    <p className="text-sm italic text-white/40">还没有写下故事，点击编辑添加…</p>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="mt-5 flex items-center justify-between border-t border-white/10 pt-5">

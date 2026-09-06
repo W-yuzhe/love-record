@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useRef, useCallback } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { ChevronLeft, CalendarDays, Loader2, ImageOff, Plus } from 'lucide-react'
 import { motion } from 'framer-motion'
@@ -8,6 +8,8 @@ import { GlassCard } from '@/components/ui/GlassCard'
 import { GradientButton } from '@/components/ui/GradientButton'
 import { PhotoNoteModal } from '@/components/memories/PhotoNoteModal'
 import { setLocalMonthCover } from '@/lib/localMonthCovers'
+import { fileToBase64, fileType } from '@/utils/file'
+import { compressImages } from '@/utils/image'
 import type { Memory, MemoryMedia } from '@/types'
 
 interface DateGroup {
@@ -23,6 +25,7 @@ export default function MonthAlbum() {
   const { memories, loading, updateMemoryMedia, refresh } = useMemories()
   const [active, setActive] = useState<{ memory: Memory; media: MemoryMedia } | null>(null)
   const [expandedDates, setExpandedDates] = useState<Set<string>>(new Set())
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const monthMemories = useMemo(() => {
     if (!monthKey) return []
@@ -100,6 +103,31 @@ export default function MonthAlbum() {
       refresh()
     }
   }
+
+  const handleAddFiles = useCallback(
+    async (files: FileList | null) => {
+      if (!active || !files || files.length === 0) return
+      const compressed = await compressImages(Array.from(files))
+      const newMedia = await Promise.all(
+        compressed.map(async (file, idx) => {
+          const url = await fileToBase64(file)
+          return {
+            id: `local-media-${Date.now()}-${idx}-${Math.random().toString(36).slice(2, 6)}`,
+            memory_id: active.memory.id,
+            url,
+            type: fileType(file),
+            sort_order: active.memory.media.length + idx,
+            note: '',
+            likes: 0,
+            is_cover: false,
+          } as MemoryMedia
+        }),
+      )
+      await updateMemoryMedia(active.memory.id, (mediaList) => [...mediaList, ...newMedia])
+      refresh()
+    },
+    [active, updateMemoryMedia, refresh],
+  )
 
   const renderMediaThumb = (
     item: { memory: Memory; media: MemoryMedia },
@@ -255,6 +283,15 @@ export default function MonthAlbum() {
           })}
       </div>
 
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*,video/*"
+        multiple
+        className="hidden"
+        onChange={(e) => handleAddFiles(e.target.files)}
+      />
+
       {active && (
         <PhotoNoteModal
           memory={active.memory}
@@ -264,6 +301,7 @@ export default function MonthAlbum() {
           onLike={handleLike}
           onDelete={handleDelete}
           onSetCover={handleSetCover}
+          onAddFiles={() => fileInputRef.current?.click()}
         />
       )}
     </section>
