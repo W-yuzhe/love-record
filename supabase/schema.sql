@@ -7,11 +7,20 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- 1. 用户资料表
 CREATE TABLE IF NOT EXISTS profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  email TEXT UNIQUE NOT NULL,
+  email TEXT,
   nickname TEXT NOT NULL,
   avatar_url TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- 为已存在的 profiles 表移除 email 的 NOT NULL / UNIQUE 约束（兼容匿名用户空邮箱）
+ALTER TABLE profiles ALTER COLUMN email DROP NOT NULL;
+DO $$
+BEGIN
+  ALTER TABLE profiles DROP CONSTRAINT IF EXISTS profiles_email_key;
+EXCEPTION
+  WHEN undefined_object THEN NULL;
+END $$;
 
 -- 2. 情侣配对表
 CREATE TABLE IF NOT EXISTS couples (

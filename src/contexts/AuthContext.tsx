@@ -100,9 +100,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const ensureProfile = async (user: User) => {
       const nickname =
         user.user_metadata?.nickname || siteConfig.partnerA
+      // 匿名用户没有 email，生成唯一占位邮箱避免 profiles.email UNIQUE 冲突
+      const email = user.email || `anonymous-${user.id}@local`
       const upsert = {
         id: user.id,
-        email: user.email || '',
+        email,
         nickname,
         avatar_url: user.user_metadata?.avatar_url,
       }
