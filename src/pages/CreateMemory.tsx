@@ -25,6 +25,7 @@ import { Chip } from '@/components/ui/Chip'
 import { useAuth } from '@/contexts/AuthContext'
 import { createMemory } from '@/api/memories'
 import { isSupabaseConfigured } from '@/lib/supabase'
+import { compressImages } from '@/utils/image'
 import type { MemoryMood } from '@/types'
 
 const weatherOptions = [
@@ -100,25 +101,26 @@ export default function CreateMemory() {
     sessionStorage.setItem('create-memory-warnings', JSON.stringify(dismissedWarnings))
   }, [dismissedWarnings])
 
-  const addFiles = (newFiles: File[]) => {
-    newFiles.forEach((file) => {
+  const addFiles = async (newFiles: File[]) => {
+    const compressed = await compressImages(newFiles)
+    compressed.forEach((file) => {
       const type = file.type.startsWith('video/') ? 'video' : 'image'
       const url = URL.createObjectURL(file)
       setMediaFiles((prev) => [...prev, { file, type, preview: url }])
     })
   }
 
-  const onDrop = useCallback((e: React.DragEvent) => {
+  const onDrop = useCallback(async (e: React.DragEvent) => {
     e.preventDefault()
-    addFiles(Array.from(e.dataTransfer.files))
+    await addFiles(Array.from(e.dataTransfer.files))
   }, [])
 
-  const onImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    addFiles(Array.from(e.target.files || []))
+  const onImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    await addFiles(Array.from(e.target.files || []))
   }
 
-  const onVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    addFiles(Array.from(e.target.files || []))
+  const onVideoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    await addFiles(Array.from(e.target.files || []))
   }
 
   const removeFile = (index: number) => {

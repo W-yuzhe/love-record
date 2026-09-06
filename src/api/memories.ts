@@ -198,6 +198,9 @@ export async function updateMemoryMedia(
         url: m.url,
         type: m.type,
         sort_order: idx,
+        note: m.note,
+        likes: m.likes || 0,
+        is_cover: m.is_cover || false,
       })),
     )
     if (mediaError) console.error('update media error', mediaError)

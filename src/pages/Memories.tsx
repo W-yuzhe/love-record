@@ -8,6 +8,7 @@ import { Chip } from '@/components/ui/Chip'
 import { useMemories } from '@/hooks/useMemories'
 import { PhotoNoteModal } from '@/components/memories/PhotoNoteModal'
 import { fileToBase64, fileType } from '@/utils/file'
+import { compressImages } from '@/utils/image'
 import type { Memory, MemoryMedia } from '@/types'
 
 interface DateGroup {
@@ -124,8 +125,9 @@ export default function Memories() {
   const handleAddFiles = useCallback(
     async (files: FileList | null) => {
       if (!active || !files || files.length === 0) return
+      const compressed = await compressImages(Array.from(files))
       const newMedia = await Promise.all(
-        Array.from(files).map(async (file, idx) => {
+        compressed.map(async (file, idx) => {
           const url = await fileToBase64(file)
           return {
             id: `local-media-${Date.now()}-${idx}-${Math.random().toString(36).slice(2, 6)}`,
@@ -298,17 +300,13 @@ export default function Memories() {
                     </div>
 
                     {/* Note area */}
-                    <div className="flex-1 rounded-xl border border-white/10 bg-white/5 p-3">
-                      {cover.media.note ? (
+                    {cover.media.note && (
+                      <div className="flex-1 rounded-xl border border-white/10 bg-white/5 p-3">
                         <p className="text-sm leading-relaxed text-white/80">
                           “{cover.media.note}”
                         </p>
-                      ) : (
-                        <p className="text-sm italic text-white/40">
-                          点击照片添加便签…
-                        </p>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </motion.div>

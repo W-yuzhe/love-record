@@ -241,17 +241,13 @@ export default function MonthAlbum() {
                     </div>
 
                     {/* Note area */}
-                    <div className="flex-1 rounded-xl border border-white/10 bg-white/5 p-3">
-                      {cover.media.note ? (
+                    {cover.media.note && (
+                      <div className="flex-1 rounded-xl border border-white/10 bg-white/5 p-3">
                         <p className="text-sm leading-relaxed text-white/80">
                           “{cover.media.note}”
                         </p>
-                      ) : (
-                        <p className="text-sm italic text-white/40">
-                          点击照片添加便签…
-                        </p>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </motion.div>
