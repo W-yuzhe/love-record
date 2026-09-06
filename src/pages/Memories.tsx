@@ -1,6 +1,6 @@
-import { useMemo, useState, useRef, useCallback } from 'react'
+import { useMemo, useState, useRef, useCallback, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, Plus, Loader2, ImageOff, Image, Palette } from 'lucide-react'
+import { Search, Plus, Loader2, ImageOff, Image, Palette, UploadCloud } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { GlassCard } from '@/components/ui/GlassCard'
 import { GradientButton } from '@/components/ui/GradientButton'
@@ -12,6 +12,9 @@ import { CoverStack } from '@/components/memories/CoverStack'
 import { ExperienceBackgroundPanel } from '@/components/memories/ExperienceBackgroundPanel'
 import { fileToBase64, fileType } from '@/utils/file'
 import { compressImages } from '@/utils/image'
+import { useAuth } from '@/contexts/AuthContext'
+import { migrateLocalMemories } from '@/lib/migrateLocalMemories'
+import { getLocalMemories, clearLocalMemories } from '@/lib/localMemories'
 import type { Memory, MemoryMedia } from '@/types'
 
 interface DateGroup {
@@ -24,13 +27,43 @@ interface DateGroup {
 
 export default function Memories() {
   const { memories, loading, updateMemoryMedia, updateMemory, deleteMemory, refresh } = useMemories()
+  const { user, couple } = useAuth()
   const { background, setBackground, clearBackground } = useExperienceBackground()
   const [query, setQuery] = useState('')
   const [filterTag, setFilterTag] = useState<string | null>(null)
   const [active, setActive] = useState<{ memory: Memory; media: MemoryMedia } | null>(null)
   const [expandedDates, setExpandedDates] = useState<Set<string>>(new Set())
   const [bgPanelOpen, setBgPanelOpen] = useState(false)
+  const [localCount, setLocalCount] = useState(0)
+  const [migrating, setMigrating] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    setLocalCount(getLocalMemories().length)
+  }, [memories])
+
+  const handleMigrate = async () => {
+    if (!user?.id || !couple?.id) return
+    setMigrating(true)
+    try {
+      const { migrated, errors } = await migrateLocalMemories(user.id, couple.id)
+      if (migrated > 0) {
+        clearLocalMemories()
+        setLocalCount(0)
+        await refresh()
+        alert(`已恢复 ${migrated} 条回忆到云端`)
+      }
+      if (errors.length) {
+        console.error('迁移失败项', errors)
+        alert(`部分恢复失败：\n${errors.slice(0, 3).join('\n')}`)
+      }
+    } catch (err) {
+      console.error('migrate error', err)
+      alert(`恢复失败：${err instanceof Error ? err.message : String(err)}`)
+    } finally {
+      setMigrating(false)
+    }
+  }
 
   const allTags = useMemo(
     () => Array.from(new Set(memories.flatMap((m) => m.tags || []))),
@@ -183,6 +216,21 @@ export default function Memories() {
             </h1>
           </div>
           <div className="flex items-center gap-3">
+            {localCount > 0 && memories.length === 0 && !loading && (
+              <button
+                type="button"
+                disabled={migrating}
+                onClick={handleMigrate}
+                className="flex items-center gap-2 rounded-full bg-star-pink/20 px-4 py-2 text-sm text-star-pink backdrop-blur-sm transition-colors hover:bg-star-pink/30 disabled:opacity-50"
+              >
+                {migrating ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <UploadCloud className="h-4 w-4" />
+                )}
+                恢复本地数据 ({localCount})
+              </button>
+            )}
             <div className="relative">
               <button
                 type="button"
