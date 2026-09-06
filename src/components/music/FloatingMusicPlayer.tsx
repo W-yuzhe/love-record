@@ -6,13 +6,15 @@ const STORAGE_KEY = 'music-player-open'
 const NETEASE_PLAYLIST_ID = import.meta.env.VITE_NETEASE_PLAYLIST_ID || ''
 
 export function FloatingMusicPlayer() {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(true)
   const [isLoaded, setIsLoaded] = useState(false)
 
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY)
-      if (saved) setIsOpen(saved === 'true')
+      if (saved !== null) {
+        setIsOpen(saved === 'true')
+      }
     } catch {
       // ignore
     }
@@ -27,7 +29,7 @@ export function FloatingMusicPlayer() {
   }, [isOpen])
 
   const iframeSrc = NETEASE_PLAYLIST_ID
-    ? `https://music.163.com/outchain/player?type=0&id=${NETEASE_PLAYLIST_ID}&auto=0&height=90`
+    ? `https://music.163.com/outchain/player?type=0&id=${NETEASE_PLAYLIST_ID}&auto=1&height=90`
     : ''
 
   if (!NETEASE_PLAYLIST_ID) {
@@ -79,7 +81,7 @@ export function FloatingMusicPlayer() {
             </div>
 
             <p className="mt-2 text-[10px] leading-relaxed text-white/40">
-              浏览器限制，需手动点击播放按钮才能出声。
+              已设置为自动播放，但部分浏览器仍可能需要用户先与页面交互一次才能出声。
             </p>
           </motion.div>
         )}
