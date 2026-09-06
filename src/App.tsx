@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { NavBar } from '@/components/layout/NavBar'
 import { BottomNav } from '@/components/layout/BottomNav'
+import { FloatingMusicPlayer } from '@/components/music/FloatingMusicPlayer'
 import Home from '@/pages/Home'
 import Memories from '@/pages/Memories'
 import CreateMemory from '@/pages/CreateMemory'
@@ -30,6 +31,7 @@ function App() {
         </Routes>
       </main>
       <BottomNav />
+      <FloatingMusicPlayer />
     </div>
   )
 }
