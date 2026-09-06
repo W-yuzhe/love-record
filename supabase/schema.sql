@@ -59,10 +59,19 @@ CREATE TABLE IF NOT EXISTS memory_media (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   memory_id UUID NOT NULL REFERENCES memories(id) ON DELETE CASCADE,
   url TEXT NOT NULL,
-  type TEXT NOT NULL DEFAULT 'image' CHECK (type IN ('image','audio')),
+  type TEXT NOT NULL DEFAULT 'image' CHECK (type IN ('image','video','audio')),
   sort_order INTEGER DEFAULT 0,
+  note TEXT,
+  likes INTEGER DEFAULT 0,
+  is_cover BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- 为已存在的 memory_media 表追加新字段（幂等）
+ALTER TABLE memory_media
+ADD COLUMN IF NOT EXISTS note TEXT,
+ADD COLUMN IF NOT EXISTS likes INTEGER DEFAULT 0,
+ADD COLUMN IF NOT EXISTS is_cover BOOLEAN DEFAULT FALSE;
 
 -- 6. 记忆标签/分类表
 CREATE TABLE IF NOT EXISTS memory_tags (
